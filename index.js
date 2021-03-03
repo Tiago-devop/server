@@ -5,8 +5,10 @@ const mongoose = require("mongoose");
 
 const app = express();
 
+app.use(express.json());
+
 app.listen(5000, () => console.log("Server started on port 5000"));
 
-app.get("/test", (req, res) => {
-  res.send("Some data");
-});
+// set up routers
+
+app.use("/snippet", require("./routes/snippetRouter"));
