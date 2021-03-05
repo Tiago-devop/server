@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const server = require("./authpassword");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 // setup express server
 
@@ -17,7 +19,7 @@ app.use("/snippet", require("./routes/snippetRouter"));
 // connect to mongoDB
 
 mongoose.connect(
-  `mongodb+srv://${server.nameServer}:${server.password}@snippet-manager.2uczn.mongodb.net/main?retryWrites=true&w=majority`,
+  process.env.MDB_CONNECT_STRING,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
