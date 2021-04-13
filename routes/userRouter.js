@@ -1,4 +1,6 @@
 const router = require("express").Router();
+const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
 
 router.post("/", async (req, res) => {
   try {
@@ -20,6 +22,32 @@ router.post("/", async (req, res) => {
       return res.status(400).json({
         errorMessage: "Please re-enter the password.",
       });
+
+    // make sure no account exists for this email
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({
+        errorMessage: "An account with this email already exists",
+      });
+
+    // hash the password
+
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    // save the user in the database
+
+    const newUser = new User({
+      email,
+      passwordHash,
+    });
+
+    const savedUser = await newUser.save();
+
+    res.send(savedUser);
+
+    // create a jwt token
   } catch (err) {
     res.status(500).send();
   }
