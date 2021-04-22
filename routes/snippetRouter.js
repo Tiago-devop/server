@@ -4,14 +4,14 @@ const auth = require("../middleware/auth");
 
 router.get("/", auth, async (req, res) => {
   try {
-    const snippets = await Snippet.find();
+    const snippets = await Snippet.find({ user: req.user });
     res.json(snippets);
   } catch (err) {
     res.status(500).send();
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   try {
     const { title, description, code } = req.body;
 
@@ -27,6 +27,7 @@ router.post("/", async (req, res) => {
       title,
       description,
       code,
+      user: req.user,
     });
 
     const savedSnippet = await newSnippet.save();
@@ -37,7 +38,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   try {
     const { title, description, code } = req.body;
     const snippetId = req.params.id;
@@ -62,6 +63,9 @@ router.put("/:id", async (req, res) => {
           "No snippet with this ID was found. Please contact the developer.",
       });
 
+    if (originalSnippet.user.toString() !== req.user)
+      return res.status(401).json({ errorMessage: "Unauthorized." });
+
     originalSnippet.title = title;
     originalSnippet.description = description;
     originalSnippet.code = code;
@@ -74,7 +78,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   try {
     const snippetId = req.params.id;
 
@@ -91,6 +95,9 @@ router.delete("/:id", async (req, res) => {
         errorMessage:
           "No snippet with this ID was found. Please contact the developer.",
       });
+
+    if (existingSnippet.user.toString() !== req.user)
+      return res.status(401).json({ errorMessage: "Unauthorized." });
 
     await existingSnippet.delete();
 
