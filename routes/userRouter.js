@@ -55,7 +55,13 @@ router.post("/", async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    res.cookie("token", token, { httpOnly: true }).send();
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      })
+      .send();
   } catch (err) {
     res.status(500).send();
   }
@@ -99,7 +105,13 @@ router.post("/login", async (req, res) => {
       process.env.JWT_SECRET
     );
 
-    res.cookie("token", token, { httpOnly: true }).send();
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      })
+      .send();
   } catch (err) {
     res.status(500).send();
   }
